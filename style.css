@@ -6,10 +6,10 @@
 }
 
 .timer:nth-child(2) {
-  background-image: url('IMG_4347.png'),url('IMG_4350.png'),url('IMG_4351.png');
-  background-size: 300px 300px; /* 幅100px×高さ100pxに縮小 */
-  background-repeat: no-repeat;  /* 画像を1回だけ表示 */
-  background-position: center;   /* 枠の中央に配置 */
+  background-image: url('IMG_4347.png'), url('IMG_4350.png'), url('IMG_4351.png');
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: 30% auto, 30% auto, 30% auto; /* 横幅を3枚分に調整 */
+  background-position: left center, center center, right center; /* 左・中央・右に配置 */
 }
 
 .timer:nth-child(3) {
