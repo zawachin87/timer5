@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><link rel="stylesheet" href="style.css">
+<head>
+    <meta name="robots" content="noindex">
+</head>
+<meta charset="UTF-8">
+<title>秒数カウントダウンタイマー</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #111;
+    color: #fff;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: 100vh;
+
+    gap: 10px; /* 枠同士の隙間を10pxに設定 */
+    padding: 10px; /* 画面端との余白 */
+    box-sizing: border-box;
+  }
+
+  .timer, .empty {
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timer {
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .timer.running {
+    background-color: rgba(42, 108, 255, 0.5); /* 半透明青 */
+  }
+
+  .label {
+    opacity: 0.6;
+  }
+
+  .time {
+    font-size: 4em;
+    font-weight: bold;
+  }
+
+  .empty {
+    opacity: 0.25;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="timer" data-time="150">
+    <div class="label">150秒</div>
+    <div class="time">150</div>
+  </div>
+
+  <div class="timer" data-time="100">
+    <div class="label">100秒</div>
+    <div class="time">100</div>
+  </div>
+
+  <div class="timer" data-time="90">
+    <div class="label">90秒</div>
+    <div class="time">90</div>
+  </div>
+
+  <div class="empty">特質切り替え</div>
+</div>
+
+<script>
+const timers = [];
+
+/* ===== 効果音 ===== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function beep() {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = 'square';
+  osc.frequency.value = 880;
+  gain.gain.value = 0.12;
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.1);
+}
+
+/* ===== タイマー ===== */
+document.querySelectorAll('.timer').forEach(el => {
+  const defaultTime = Number(el.dataset.time);
+
+  const state = {
+    el,
+    defaultTime,
+    remaining: defaultTime,
+    running: false,
+    interval: null,
+    display: el.querySelector('.time')
+  };
+
+  const update = () => {
+    state.display.textContent = state.remaining;
+  };
+
+  const reset = () => {
+    clearInterval(state.interval);
+    state.interval = null;
+    state.running = false;
+    state.remaining = state.defaultTime;
+    state.el.classList.remove('running');
+    update();
+  };
+
+  const tick = () => {
+    state.remaining--;
+    update();
+
+    if (state.remaining <= 10 && state.remaining > 0) {
+      beep();
+    }
+
+    if (state.remaining <= 0) {
+      reset();
+    }
+  };
+
+  const start = () => {
+    if (state.running || state.remaining <= 0) return;
+
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    state.running = true;
+    state.el.classList.add('running');
+    state.interval = setInterval(tick, 1000);
+  };
+
+  el.addEventListener('click', () => {
+    state.running ? reset() : start();
+  });
+
+  update();
+  timers.push(state);
+});
+
+/* ===== 空欄タップ処理 ===== */
+document.querySelector('.empty').addEventListener('click', () => {
+  const base = timers.find(t => t.running);
+  if (!base) return;
+
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+
+  const progress =
+    (base.defaultTime - base.remaining) / base.defaultTime;
+
+  timers.forEach(t => {
+    if (!t.running && t.remaining === t.defaultTime) {
+      t.remaining = Math.max(
+        0,
+        Math.floor(t.defaultTime * (1 - progress))
+      );
+      t.running = true;
+      t.el.classList.add('running');
+      t.display.textContent = t.remaining;
+
+      t.interval = setInterval(() => {
+        t.remaining--;
+        t.display.textContent = t.remaining;
+
+        if (t.remaining <= 10 && t.remaining > 0) {
+          beep();
+        }
+
+        if (t.remaining <= 0) {
+          clearInterval(t.interval);
+          t.running = false;
+          t.el.classList.remove('running');
+          t.remaining = t.defaultTime;
+          t.display.textContent = t.remaining;
+        }
+      }, 1000);
+    }
+  });
+});
+</script>
+
+</body>
+</html>

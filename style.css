@@ -1,0 +1,50 @@
+.timer:nth-child(1) {
+  background-image: url('IMG_4351.png');
+  background-size: 300px 300px; /* 幅100px×高さ100pxに縮小 */
+  background-repeat: no-repeat;  /* 画像を1回だけ表示 */
+  background-position: center;   /* 枠の中央に配置 */
+}
+
+.timer:nth-child(2) {
+  background-image: url('IMG_4347.png'),url('IMG_4350.png'),url('IMG_4351.png');
+  background-size: 300px 300px; /* 幅100px×高さ100pxに縮小 */
+  background-repeat: no-repeat;  /* 画像を1回だけ表示 */
+  background-position: center;   /* 枠の中央に配置 */
+}
+
+.timer:nth-child(3) {
+  position: relative;
+  background-image: url('IMG_4348.png'); /* 左側の画像 */
+  background-size: 45%;                 /* 枠の半分くらい */
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+/* 右側の画像 */
+.timer:nth-child(3)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  width: 45%;                   /* 枠の半分くらい */
+  height: 80%;                  /* 高さはお好みで */
+  background-image: url('IMG_4349.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;          /* タップを邪魔しない */
+}
+
+.empty {
+  background-image: url('IMG_3.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.7; 
+  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+}
